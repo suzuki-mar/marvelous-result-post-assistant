@@ -1,0 +1,56 @@
+rules:
+  - id: no-direct-infra-import
+    message: 'UseCase層からInfra層を直接importしないでください'
+    severity: ERROR
+    languages:
+      - typescript
+      - javascript
+    pattern-either:
+      - pattern: |
+          import $IMPORT from '@/infra/$REST';
+      - pattern: |
+          import $IMPORT from "@/infra/$REST";
+
+  - id: missing-use-server
+    message: "Server Actionには 'use server' 指定が必要です"
+    severity: WARNING
+    languages:
+      - typescript
+    patterns:
+      - pattern: |
+          export async function $FUNC($ARGS) {
+            ...
+          }
+      - metavariable-regex:
+          metavariable: FUNC
+          regex: '.*Action$'
+      - pattern-not: |
+          export async function $FUNC($ARGS) {
+            'use server';
+            ...
+          }
+      - pattern-not: |
+          export async function $FUNC($ARGS) {
+            "use server";
+            ...
+          }
+
+  - id: server-action-logic
+    message: 'Server Action内でビジネスロジックを書かないでください（UseCaseに委譲）'
+    severity: WARNING
+    languages:
+      - typescript
+    patterns:
+      - pattern: |
+          export async function $FUNC($ARGS) {
+            ...
+          }
+      - metavariable-regex:
+          metavariable: FUNC
+          regex: '.*Action$'
+      - pattern-inside: |
+          export async function $FUNC($ARGS) {
+            ...
+          }
+      - pattern: |
+          const $VAR = $VALUE;

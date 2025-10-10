@@ -1,0 +1,179 @@
+direction: right
+
+container StoryHeader: {
+  desc: |md
+    ## 🎯 Purpose
+    認証済みの運営スタッフとして、  
+    大会タイトル・日付・会場・試合カードを登録できるようにしたい。  
+    そうすることで、後続の「投稿準備」や「リマインダー通知」で参照できる  
+    大会データの土台を整え、日々の発信作業を効率化できる。
+
+    **価値**
+    - 大会・試合情報が構造化されて保存されることで、後工程の自動補完や通知が可能になる。  
+    - 投稿時に必要なデータを整理済みの状態から利用でき、人的ミスを減らせる。
+
+    **完了条件**
+    - ユーザーが大会登録画面からフォームを入力し、「登録完了」のメッセージが表示されること  
+    - 登録データ（Event / Match / Venue）が永続化され、一覧または確認画面で再取得できること  
+    - バリデーションエラー時にユーザーへ原因が明示されること  
+    - Server Action → UseCase → Domain → PM の一方向フローで処理が通ること  
+    - E2Eテストで「登録→完了表示」までのシナリオが自動化されていること  
+    - 生成AIとのコード生成・再生成ループが機能し、SRDをもとに再構築できること  
+    - Vercel + Supabase 上でこの一連の流れがデプロイ実行可能であること  
+
+    **補足（Phase 0 の位置づけ）**
+    本ストーリーは Phase 0 に属し、アプリケーションの最初の機能である。  
+    単一の大会登録ユースケースを通じて、**アーキテクチャ・インフラ・生成AI連携・テスト基盤** の動作確認を行う。
+  |
+}
+
+container ユースケース記述: {
+  label: "Use Case Description"
+  UC001: |md
+    ## UC-001: 大会を登録する
+    **アクター:** 運営スタッフ  
+
+    **メインフロー**
+    1. スタッフは「大会登録画面」を開く。  
+    2. 「大会情報入力」セクションで、タイトル・開催日・会場（都道府県＋会場名）を入力する。  
+    3. 「試合一覧入力」セクションで、試合名と試合順を追加していく。  
+       - 各試合は1行単位で入力し、順番をEnum（1〜9・SEMI・MAIN）から選択する。  
+    4. 入力内容を確認し、「登録」ボタンを押す。  
+    5. システムが入力を検証し、エラーがなければ大会と試合が保存される。  
+    6. 保存成功時には「大会登録が完了しました」とメッセージが表示される。
+
+    **例外フロー**
+    - 必須項目（タイトル・日付・会場・試合名）が空の場合 → 該当フィールド下にエラーメッセージを表示する。  
+    - 試合順が重複している場合 → 「試合順が重複しています」とエラーを表示する。  
+    - 同じタイトル＋開催日の大会が既に存在する場合 → 「同じ大会が既に登録されています」と警告を表示する。  
+
+    **事後条件**
+    - 登録した大会情報と試合一覧が保存され、一覧または確認画面で再表示できる。  
+    - エラー発生時は入力内容を保持したまま修正して再送信できる。
+
+    **補足（開発メモ）**
+    - このユースケースではまだログイン機能を実装しない。  
+      すべての操作はログイン不要で行える。  
+    - フェーズ1以降で認証と権限を導入予定。  
+    - 本フェーズの目的は、**アプリ構造の貫通と基本動作の確認**である。
+  |
+}
+
+container ドメインモデル: {
+  label: "ドメインモデル"
+
+  EventAggregate: {
+    label: "Event Aggregate Root"
+    direction: down
+
+    Event: {
+      shape: class
+      +id: ID
+      +title: String
+      +date: String
+      +location: String
+      +matches: List<Match>
+    }
+
+    Match: {
+      shape: class
+      +id: ID
+      +name: String
+      +order: Enum(1, 2, 3, 4, 5, 6, 7, 8, 9, SEMI, MAIN)
+      +wrestlerIds: List<ID>
+    }
+
+    Venue: {
+      shape: class
+      +prefecture: Enum(
+      北海道, 青森県, 岩手県, 宮城県, 秋田県, 山形県, 福島県,
+      茨城県, 栃木県, 群馬県, 埼玉県, 千葉県, 東京都, 神奈川県,
+      新潟県, 富山県, 石川県, 福井県, 山梨県, 長野県,
+      岐阜県, 静岡県, 愛知県, 三重県,
+      滋賀県, 京都府, 大阪府, 兵庫県, 奈良県, 和歌山県,
+      鳥取県, 島根県, 岡山県, 広島県, 山口県,
+      徳島県, 香川県, 愛媛県, 高知県,
+      福岡県, 佐賀県, 長崎県, 熊本県, 大分県, 宮崎県, 鹿児島県, 沖縄県
+      )
+      +detail: String
+    }
+  }
+}
+
+direction: down
+
+direction: down
+
+container 不変条件: {
+  label: "不変条件"
+  direction: down
+
+  Event: |md
+    ## Event
+
+    title は空であってはならない  
+    date は空であってはならない  
+    location は空であってはならない  
+    id は一意でなければならない  
+    matches に SEMI と MAIN が含まれていなければならない  
+  |
+  Event.shape: rectangle
+
+  Match: |md
+    ## Match
+
+    name は空であってはならない  
+    id は一意でなければならない  
+    order は Event 内で一意でなければならない  
+  |
+  Match.shape: rectangle
+
+  Venue: |md
+    ## Venue
+
+    - `prefecture` は必須であり、上記 Enum のいずれかでなければならない  
+    - `detail` は空文字であってはならない  
+    - `detail` には都道府県名を含めてはならない（重複入力を避けるため）  
+    - `prefecture × detail` の組み合わせで Venue の同一性が定義される  
+    - 表示時は `"${prefecture} ${detail}"` の形式で出力される  
+
+  |
+  Venue.shape: rectangle
+}
+
+container ロバストネス図: {
+  label: "ロバストネス図"
+
+  Boundary_大会登録画面: {
+    label: "《boundary》\n大会登録画面"
+    shape: rectangle
+  }
+  Control_RegisterEvent: {
+    label: "《control》\nRegisterEventUseCase"
+    shape: hexagon
+  }
+  Entity_Event: {
+    label: "《entity》\nEvent"
+    shape: class
+  }
+  Entity_EventRepository: {
+    label: "《entity》\nEventRepository"
+    shape: class
+  }
+
+  Boundary_大会登録画面 -> Control_RegisterEvent: "入力の送信"
+  Control_RegisterEvent -> Entity_Event: "Event.new(...)"
+  Control_RegisterEvent -> Entity_EventRepository: "registerEvent(event)"
+  Entity_EventRepository -> Control_RegisterEvent: "保存結果"
+  Control_RegisterEvent -> Boundary_大会登録画面: "結果を返却"
+}
+
+container コミュニケーション図: {
+  label: "コミュニケーション図"
+
+  # 呼び出しフロー（補足）
+  RegisterEventUseCase.run -> RegisterEventUseCase.validate
+  RegisterEventUseCase.validate -> EventPM.updateToCantCreateEvent: "バリデーション失敗"
+  RegisterEventUseCase.validate -> EventRepository.registerEvent: "バリデーション成功"
+  EventRepository.registerEvent -> EventPM.updateToCreatedEvent
+}

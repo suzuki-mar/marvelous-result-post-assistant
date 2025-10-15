@@ -1,19 +1,75 @@
 #!/usr/bin/env sh
 set -e
 
-npm run lint:ci &
-LINT_PID=$!
+LOG_DIR=$(mktemp -d -t prepush-XXXXXX)
 
-npm run semgrep:ci &
-SEMGREP_PID=$!
+cleanup() {
+  status=$?
+  if [ "$status" -eq 0 ]; then
+    rm -rf "$LOG_DIR"
+  else
+    echo "ログ保管場所: $LOG_DIR"
+  fi
+}
 
-npm test &
-TEST_PID=$!
+trap cleanup EXIT
 
-npm run deploy-test &
-DEPLOY_PID=$!
+log_file_for() {
+  label=$1
+  sanitized=$(printf '%s' "$label" | tr '[:space:]/:' '___')
+  printf '%s/%s.log' "$LOG_DIR" "$sanitized"
+}
 
-wait $LINT_PID
-wait $SEMGREP_PID
-wait $TEST_PID
-wait $DEPLOY_PID
+run_step() {
+  label=$1
+  shift
+  log_file=$(log_file_for "$label")
+  echo "→ $label"
+  if "$@" >"$log_file" 2>&1; then
+    echo "✓ $label"
+  else
+    status=$?
+    echo "✗ $label (exit $status)"
+    tail -n 40 "$log_file"
+    echo "詳細ログ: $log_file"
+    exit $status
+  fi
+}
+
+start_async() {
+  label=$1
+  shift
+  log_file=$(log_file_for "$label")
+  echo "→ $label"
+  "$@" >"$log_file" 2>&1 &
+  pid=$!
+  eval "${label}_PID=$pid"
+  eval "${label}_LOG='$log_file'"
+}
+
+wait_for() {
+  label=$1
+  pid=$(eval "printf '%s' \"\$${label}_PID\"")
+  log_file=$(eval "printf '%s' \"\$${label}_LOG\"")
+  if wait "$pid"; then
+    echo "✓ $label"
+  else
+    status=$?
+    echo "✗ $label (exit $status)"
+    tail -n 40 "$log_file"
+    echo "詳細ログ: $log_file"
+    exit $status
+  fi
+}
+
+start_async ci_lint npm run ci:lint
+start_async ci_semgrep npm run ci:semgrep
+
+run_step "unit tests" npm run test:unit
+run_step "integration tests" npm run test:integration
+
+start_async ci_deploy npm run ci:deploy
+
+wait_for ci_lint
+wait_for ci_semgrep
+wait_for ci_deploy

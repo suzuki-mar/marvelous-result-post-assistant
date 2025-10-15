@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "🧾 直前のコミットで編集されたファイルの行数："
+git show --name-only --pretty="" HEAD | while read file; do
+  if [ -f "$file" ]; then
+    lines=$(wc -l < "$file")
+    echo "  $file: ${lines} lines"
+  fi
+done | awk '{sum+=$NF; print} END {print "--------------------------------"; print "合計:", sum, "lines"}'

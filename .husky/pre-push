@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+set -e
+
+npm run lint:ci &
+LINT_PID=$!
+
+npm run semgrep:ci &
+SEMGREP_PID=$!
+
+npm test &
+TEST_PID=$!
+
+npm run deploy-test &
+DEPLOY_PID=$!
+
+wait $LINT_PID
+wait $SEMGREP_PID
+wait $TEST_PID
+wait $DEPLOY_PID

@@ -36,6 +36,8 @@ export default defineConfig({
     environment: 'node',
     include: includePatterns,
     exclude: ['node_modules', 'dist'],
+    setupFiles: ['test/stubs/dbReset.ts'],
+
   },
   resolve: {
     alias: {

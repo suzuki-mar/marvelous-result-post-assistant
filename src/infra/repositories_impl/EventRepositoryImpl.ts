@@ -2,7 +2,7 @@ import { type EventRepository, EventRepositoryError } from '@/models/repositorie
 import { type Event } from '@/models/domains/Event'
 import { writeLog } from '@/infra/logger'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { type EventEntityType } from '@/entity-types'
+import { type EventEntityType } from '@/models/types'
 import type { ToDBRow } from '@/infra/type-helper/to-db-row'
 
 type EventRow = ToDBRow<EventEntityType>

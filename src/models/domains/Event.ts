@@ -1,4 +1,4 @@
-import type { EventEntityType } from '@/entity-types'
+import type { EventEntityType } from '@/models/types'
 
 export type EventData = EventEntityType
 

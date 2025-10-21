@@ -1,4 +1,4 @@
-import { type EventRepository, EventRepositoryError } from '@/models/entities/EventRepository'
+import { type EventRepository, EventRepositoryError } from '@/models/repositories/EventRepository'
 import { type Event } from '@/models/domains/Event'
 import { writeLog } from '@/infra/logger'
 import type { SupabaseClient } from '@supabase/supabase-js'

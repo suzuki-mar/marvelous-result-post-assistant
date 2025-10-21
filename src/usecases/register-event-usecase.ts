@@ -1,5 +1,5 @@
 import { writeLog } from '@/infra/logger'
-import { type EventRepository } from '@/models/entities/EventRepository'
+import { type EventRepository } from '@/models/repositories/EventRepository'
 import { type Event } from '@/models/domains/Event'
 import type { Result } from '@/result'
 

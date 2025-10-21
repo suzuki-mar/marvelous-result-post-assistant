@@ -18,9 +18,7 @@ export class EventRepositoryImpl implements EventRepository {
       const row: EventRow = {
         id: value.id,
         title: value.title,
-        scheduled_at: value.scheduledAt.toISOString(),
         hosting_prefecture: value.hostingPrefecture,
-        hosting_venue_detail: value.hostingVenueDetail,
         created_at: value.createdAt.toISOString(),
       }
 

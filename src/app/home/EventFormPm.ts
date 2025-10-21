@@ -1,6 +1,6 @@
 import type { EventEntityType } from '@/entity-types'
 
-type EventFormBaseFields = Omit<EventEntityType, 'id' | 'scheduledAt' | 'createdAt'>
+type EventFormBaseFields = Omit<EventEntityType, 'id' | 'createdAt'>
 
 export type EventFormPmType = EventFormBaseFields & {
   scheduledAtInput: string
@@ -11,7 +11,6 @@ export class EventFormPm {
     title: '',
     scheduledAtInput: '',
     hostingPrefecture: '',
-    hostingVenueDetail: '',
     matches: null,
   }
 

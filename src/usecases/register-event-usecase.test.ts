@@ -12,7 +12,6 @@ type RegisterEventUseCaseTestCase = {
     status: 'ok'
     title: string
     prefecture: string
-    venue: string
   }
 }
 
@@ -20,9 +19,7 @@ const buildNormalCase = (): RegisterEventUseCaseTestCase => {
   const event = new Event({
     id: crypto.randomUUID(),
     title: faker.lorem.words(3),
-    scheduledAt: faker.date.future({ years: 3 }),
     hostingPrefecture: faker.location.state(),
-    hostingVenueDetail: faker.company.name(),
     matches: null,
     createdAt: new Date(),
   })
@@ -36,7 +33,6 @@ const buildNormalCase = (): RegisterEventUseCaseTestCase => {
       status: 'ok',
       title: value.title,
       prefecture: value.hostingPrefecture,
-      venue: value.hostingVenueDetail,
     },
   }
 }
@@ -67,7 +63,6 @@ describe.each(cases)('🧪 %s', ({ input, expected }): void => {
     const event = result.value.getValue()
     expect(event.title).toBe(expected.title)
     expect(event.hostingPrefecture).toBe(expected.prefecture)
-    expect(event.hostingVenueDetail).toBe(expected.venue)
   })
 
   afterAll(async () => {

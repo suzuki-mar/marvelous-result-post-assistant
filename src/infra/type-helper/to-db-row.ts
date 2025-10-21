@@ -34,9 +34,7 @@
  *   type EventEntity = {
  *     id: string
  *     title: string
- *     scheduledAt: Date
  *     hostingPrefecture: string
- *     hostingVenueDetail: string
  *     matches: Match[] | null
  *     createdAt: Date
  *   }
@@ -48,9 +46,7 @@
  *   // {
  *   //   id: string
  *   //   title: string
- *   //   scheduled_at: string
  *   //   hosting_prefecture: string
- *   //   hosting_venue_detail: string
  *   //   created_at: string
  *   // }
  *
@@ -61,9 +57,7 @@
  *   // {
  *   //   id: string
  *   //   title: string
- *   //   scheduled_at: string
  *   //   hosting_prefecture: string
- *   //   hosting_venue_detail: string
  *   //   matches: Match[]
  *   //   created_at: string
  *   // }

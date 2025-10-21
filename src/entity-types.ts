@@ -6,9 +6,7 @@ export type EventMatchType = {
 export type EventEntityType = {
   id: string
   title: string
-  scheduledAt: Date
   hostingPrefecture: string
-  hostingVenueDetail: string
   matches: Array<EventMatchType> | null
   createdAt: Date
 }

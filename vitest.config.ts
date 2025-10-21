@@ -1,3 +1,4 @@
+import path from 'path'
 import { config as loadEnv, type DotenvConfigOutput } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import { defineConfig } from 'vitest/config'
@@ -35,5 +36,11 @@ export default defineConfig({
     environment: 'node',
     include: includePatterns,
     exclude: ['node_modules', 'dist'],
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@faker-js/faker': path.resolve(__dirname, 'test/stubs/faker.ts'),
+    },
   },
 })

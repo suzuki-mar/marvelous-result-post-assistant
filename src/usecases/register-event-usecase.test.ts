@@ -12,6 +12,7 @@ type RegisterEventUseCaseTestCase = {
     status: 'ok'
     title: string
     prefecture: string
+    eventDatetime: Date
   }
 }
 
@@ -21,6 +22,7 @@ const buildNormalCase = (): RegisterEventUseCaseTestCase => {
     title: faker.lorem.words(3),
     hostingPrefecture: faker.location.state(),
     matches: null,
+    eventDatetime: faker.date.future(),
     createdAt: new Date(),
   })
 
@@ -33,6 +35,7 @@ const buildNormalCase = (): RegisterEventUseCaseTestCase => {
       status: 'ok',
       title: value.title,
       prefecture: value.hostingPrefecture,
+      eventDatetime: value.eventDatetime,
     },
   }
 }
@@ -63,6 +66,7 @@ describe.each(cases)('🧪 %s', ({ input, expected }): void => {
     const event = result.value.getValue()
     expect(event.title).toBe(expected.title)
     expect(event.hostingPrefecture).toBe(expected.prefecture)
+    expect(event.eventDatetime).toEqual(expected.eventDatetime)
   })
 
   afterAll(async () => {

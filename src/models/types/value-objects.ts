@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { HourDateTime } from '@/models/domains/HourDateTime'
 
 export const PREFECTURES = [
   // 北海道・東北
@@ -65,6 +66,47 @@ export const PREFECTURES = [
 
 export type PrefectureType = (typeof PREFECTURES)[number]
 
-export const PrefectureSchema = z.enum(PREFECTURES).refine((val) => PREFECTURES.includes(val), {
-  message: '都道府県の指定が不正です',
+export const PrefectureSchema = z.enum(PREFECTURES).superRefine((value, ctx) => {
+  if (!PREFECTURES.includes(value)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '都道府県の指定が不正です',
+    })
+  }
 })
+
+export type HourDateTimeType = HourDateTime
+
+export const HourDateTimeSchema = z
+  .any()
+  .transform((val, ctx) => {
+    const toDate = (input: unknown): Date | null => {
+      if (input instanceof HourDateTime) {
+        return input.toDate()
+      }
+
+      if (input instanceof Date) {
+        return input
+      }
+
+      if (typeof input === 'string' || typeof input === 'number') {
+        const parsed = new Date(input)
+        return Number.isNaN(parsed.getTime()) ? null : parsed
+      }
+
+      return null
+    }
+
+    const date = toDate(val)
+
+    if (!date || Number.isNaN(date.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '日時の形式が不正です',
+      })
+      return z.NEVER
+    }
+
+    return date
+  })
+  .transform((date) => HourDateTime.create(date))

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PREFECTURES } from './value-objects'
+import { PREFECTURES, HourDateTimeSchema } from './value-objects'
 import type { EventEntityType, EventMatchType, EventPreRegisterType } from '.'
 
 export const EventMatchSchema = z.object({
@@ -24,6 +24,7 @@ export const EventSchema = z.object({
     .max(30, 'タイトルは30文字以内で入力してください'),
   hostingPrefecture: z.enum(PREFECTURES),
   matches: z.array(EventMatchSchema).nullable(),
+  eventDatetime: HourDateTimeSchema,
   createdAt: z.date(),
 }) satisfies z.ZodType<EventEntityType>
 

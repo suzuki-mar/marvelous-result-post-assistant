@@ -19,6 +19,7 @@ export class EventRepositoryImpl implements EventRepository {
         id: value.id,
         title: value.title,
         hosting_prefecture: value.hostingPrefecture,
+        event_datetime: value.eventDatetime.toISOString(),
         created_at: value.createdAt.toISOString(),
       }
 

@@ -1,3 +1,4 @@
+import { type HourDateTime } from '../domains/HourDateTime'
 import type { PrefectureType } from './value-objects'
 
 export type EventMatchType = {
@@ -10,6 +11,7 @@ export type EventEntityType = {
   title: string
   hostingPrefecture: PrefectureType
   matches: Array<EventMatchType> | null
+  eventDatetime: HourDateTime
   createdAt: Date
 }
 

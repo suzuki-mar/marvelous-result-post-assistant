@@ -1,16 +1,16 @@
 import type { EventEntityType, PrefectureType } from '@/models/types'
 
-type EventFormBaseFields = Omit<EventEntityType, 'id' | 'createdAt'>
+type EventFormBaseFields = Omit<EventEntityType, 'id' | 'createdAt' | 'eventDatetime'>
 
 export type EventFormPmType = Omit<EventFormBaseFields, 'hostingPrefecture'> & {
   hostingPrefecture: PrefectureType | ''
-  scheduledAtInput: string
+  eventDatetimeInput: string
 } // 大会だけ登録をする場合があるためmatchesはnullableのまま維持する
 
 export class EventFormPm {
   private state: EventFormPmType = {
     title: '',
-    scheduledAtInput: '',
+    eventDatetimeInput: '',
     hostingPrefecture: '',
     matches: null,
   }

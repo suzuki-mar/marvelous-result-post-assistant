@@ -81,15 +81,19 @@ type DropNever<T> = {
 }
 
 /** DB保存用に型を変換（Date→string, Array除外, snake_case化） */
+type IsoLike = { toISOString(): string }
+
 type SnakeCaseKeys<T, KeepArrayKeys extends keyof any = never> = {
   [K in keyof T as CamelToSnake<Extract<K, string>>]: T[K] extends Date // Date → string
     ? string
-    : // Arrayを含む型（null含む）→原則除外。Keep指定時のみ残す
-      Extract<T[K], ReadonlyArray<any>> extends never
-      ? T[K]
-      : K extends KeepArrayKeys
-        ? NonNullable<T[K]> // JSONB保持時はnull除去
-        : never
+    : T[K] extends IsoLike // toISOStringを持つ値オブジェクト → string
+      ? string
+      : // Arrayを含む型（null含む）→原則除外。Keep指定時のみ残す
+        Extract<T[K], ReadonlyArray<any>> extends never
+        ? T[K]
+        : K extends KeepArrayKeys
+          ? NonNullable<T[K]> // JSONB保持時はnull除去
+          : never
 }
 
 /* -------------------------------------------------------------------------- */

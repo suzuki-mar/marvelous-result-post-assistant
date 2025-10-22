@@ -36,9 +36,11 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",
+    "jp-prefecture": "^0.2.1",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -57,7 +59,8 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod-validation-error": "^4.0.2"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

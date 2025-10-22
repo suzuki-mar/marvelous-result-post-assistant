@@ -1,8 +1,9 @@
-import type { EventEntityType } from '@/entity-types'
+import type { EventEntityType, PrefectureType } from '@/models/types'
 
 type EventFormBaseFields = Omit<EventEntityType, 'id' | 'createdAt'>
 
-export type EventFormPmType = EventFormBaseFields & {
+export type EventFormPmType = Omit<EventFormBaseFields, 'hostingPrefecture'> & {
+  hostingPrefecture: PrefectureType | ''
   scheduledAtInput: string
 } // 大会だけ登録をする場合があるためmatchesはnullableのまま維持する
 
